@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wheatly — Games & Browser</title>
+<style>
+:root{--bg:#080808;--panel:#121212;--panel2:#1a1a1a;--gold:#f5c451;--gold2:#c89422;--text:#f7f2e5;--muted:#b9b2a0;--line:#5d4719}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#30220b 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}button,a{cursor:pointer}a{color:var(--gold)}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;padding:14px 22px;background:#090909ee;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+.brand{font-size:27px;font-weight:900;letter-spacing:.3px;color:var(--gold);white-space:nowrap}.brand span{filter:drop-shadow(0 0 10px #f5c45133)}
+#address{flex:1;min-width:100px;border:1px solid var(--gold2);border-radius:999px;background:#171717;color:white;padding:11px 16px;outline:none}
+.btn{border:1px solid var(--gold2);background:linear-gradient(135deg,#f5c451,#dba32f);color:#171107;font-weight:800;padding:10px 15px;border-radius:12px}
+.btn.secondary{background:#171717;color:var(--gold);border-color:var(--line)}
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:22px;max-width:1450px;margin:auto;padding:22px}
+aside{border-right:1px solid var(--line);padding-right:16px}.navbtn{display:block;width:100%;text-align:left;background:transparent;color:var(--text);border:0;border-radius:10px;padding:12px;margin-bottom:5px}.navbtn.active,.navbtn:hover{background:#30240e;color:var(--gold)}
+main{min-width:0}.hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(115deg,#17120a,#0d0d0d 60%);margin-bottom:22px}
+h1{font-size:clamp(30px,4vw,48px);line-height:1.05;margin:0 0 10px;color:var(--gold)}h2{margin:0 0 14px;font-size:23px;color:var(--gold)}p{color:var(--muted);margin:0 0 16px}.toast{font-size:76px;filter:drop-shadow(0 0 18px #f5c45155)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 18px}.toolbar input,.toolbar select{background:#151515;color:white;border:1px solid var(--line);border-radius:10px;padding:10px}.toolbar input{flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{background:linear-gradient(150deg,#171717,#101010);border:1px solid #3b321e;border-radius:16px;padding:17px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card .emoji{font-size:34px}.card h3{margin:0;font-size:18px}.card p{font-size:14px;flex:1;margin:0}.tag{font-size:12px;color:var(--gold);border:1px solid var(--line);border-radius:99px;padding:3px 8px;align-self:flex-start}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+.panel{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#101010;margin-bottom:18px}
+.panelhead{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line);color:var(--gold);font-weight:800}
+#gameFrame{width:100%;height:min(68vh,680px);border:0;background:#fff}.browser-fallback{padding:15px 18px;border-top:1px solid var(--line);background:#17130b}.browser-fallback strong{color:var(--gold)}.browser-fallback p{margin:6px 0 12px;font-size:13px}.tabbar{display:flex;gap:6px;align-items:center;padding:8px 10px;background:#0b0b0b;border-bottom:1px solid var(--line);overflow-x:auto}.tab{background:#211b0e;color:var(--gold);border:1px solid var(--line);border-radius:9px 9px 0 0;padding:8px 14px;white-space:nowrap}.tab.active{background:#3a2b0e;border-color:var(--gold2)}.tab-add{background:#171717;color:var(--gold);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:18px}.browser-tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--line)}.browser-status{color:var(--muted);font-size:13px;flex:1;min-width:80px}#emptyFrame{padding:30px;text-align:center;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin-top:18px}.hidden{display:none!important}
+footer{padding:20px;text-align:center;color:#827b6c;font-size:12px}
+@media(max-width:760px){.browser-tools .btn{padding:8px 10px}.browser-status{display:none}header{flex-wrap:wrap;padding:12px}.brand{width:100%}.layout{grid-template-columns:1fr;padding:12px}aside{display:flex;gap:5px;overflow:auto;border:0;padding:0}.navbtn{white-space:nowrap;width:auto}.hero{padding:19px}.toast{font-size:50px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span>🍞</span> Wheatly</div>
+  <input id="address" aria-label="Browser address bar" placeholder="Search or enter a website URL">
+  <button class="btn secondary" id="goBrowser">Go</button>
+  <button class="btn" id="gamesTop">Games</button>
+</header>
+<div class="layout">
+  <aside>
+    <button class="navbtn active" data-view="games">🎮 Games</button>
+    <button class="navbtn" data-view="browser">🌐 Browser</button>
+    <button class="navbtn" data-view="favorites">⭐ Favorites</button>
+  </aside>
+  <main>
+    <section class="hero">
+      <div><h1>Play. Browse. Repeat.</h1><p>Welcome to Wheatly — your black-and-gold home for browser games and the web.</p><button class="btn" id="explore">Explore games →</button></div>
+      <div class="toast" aria-hidden="true">🍞</div>
+    </section>
+
+    <section id="gamesView">
+      <h2>Game Library</h2>
+      <div class="toolbar">
+        <input id="search" placeholder="Search games and collections…" aria-label="Search games">
+        <select id="category" aria-label="Filter by category"><option value="all">All categories</option><option>Arcade</option><option>Puzzle</option><option>Collection</option></select>
+      </div>
+      <div class="grid" id="gameGrid"></div>
+      <p class="note">Tip: “Open game” visits the game host. “Play here” appears only when a publisher supplies an approved embeddable game URL. Never iframe a site that forbids embedding.</p>
+    </section>
+
+    <section id="browserView" class="hidden">
+      <h2>Wheatly Browser</h2>
+      <div class="panel">
+        <div class="tabbar" id="tabbar"><button class="tab active" data-tab="0">New tab</button><button class="tab-add" id="newTab" aria-label="New tab">＋</button></div>
+        <div class="browser-tools">
+          <button class="btn secondary" id="backBtn" title="Back">←</button>
+          <button class="btn secondary" id="forwardBtn" title="Forward">→</button>
+          <button class="btn secondary" id="refreshBtn" title="Refresh">↻</button>
+          <span id="frameTitle" class="browser-status">New tab</span><span class="browser-status" id="browserStatus">Ready</span>
+          <button class="btn secondary" id="checkBackend" type="button">Check with Wheatly ↗</button>
+          <button class="btn secondary" id="openExternal">Open in new tab ↗</button>
+        </div>
+        <div id="emptyFrame">Enter a website URL above and press Go.<br><br>Some websites block being shown inside another website.</div>
+        <iframe id="gameFrame" class="hidden" title="Wheatly browser content" allow="fullscreen; gamepad; autoplay; clipboard-read; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <div id="frameFallback" class="browser-fallback hidden" role="status">
+          <strong>Having trouble viewing this page?</strong>
+          <p>Some websites block being displayed inside Wheatly. That restriction cannot be fixed by changing the address.</p>
+          <button class="btn" id="fallbackOpen" type="button">Open this website in a new tab ↗</button>
+        </div>
+      </div>
+      <p class="note">Wheatly displays websites that allow iframe embedding. Use “Check with Wheatly” to test approved hosts through its Cloudflare backend. This check does not bypass iframe restrictions or render blocked pages.</p>
+    </section>
+
+    <section id="favoritesView" class="hidden">
+      <h2>Your Favorites</h2><div class="grid" id="favoritesGrid"></div>
+    </section>
+  </main>
+</div>
+<footer>Wheatly • Black & gold • Only add games you have permission to embed or link to.</footer>
+<script>
+/*
+  Add games by editing GAMES below.
+  url: official game/page URL (used by "Open game")
+  embedUrl: OPTIONAL publisher-approved direct embed URL. Leave blank unless embedding is permitted.
+  Check each game's license and host terms before redistributing files or embedding it.
+*/
+const GAMES = [
+  {
+    id:"open-games", name:"OpenGames", category:"Collection", icon:"🕹️",
+    description:"Open-source browser games including arcade and action titles.",
+    url:"https://open-games.org/",
+    embedUrl:""
+  },
+  {
+    id:"open-games-source", name:"OpenGames Source", category:"Collection", icon:"🧩",
+    description:"Browse the project and its open-source game information.",
+    url:"https://opengames-dev.github.io/source.html",
+    embedUrl:""
+  },
+  {
+    id:"web-arcade", name:"Web Arcade", category:"Arcade", icon:"👾",
+    description:"A collection of small browser games; review the repository license before reusing any files.",
+    url:"https://duysqubix.github.io/web-arcade/",
+    embedUrl:""
+  },
+  {
+    id:"itch-free-html5", name:"Free HTML5 Games on itch.io", category:"Collection", icon:"🎲",
+    description:"Discover indie HTML5 games. Embed a game only when its creator permits it.",
+    url:"https://itch.io/games/html5/price-free",
+    embedUrl:""
+  },
+  {
+    id:"science-activity-716", name:"Science Activity", category:"Puzzle", icon:"🔬",
+    description:"Science activity hosted on the PragerU server. If the embedded page is blocked, open it directly.",
+    url:"https://s3.amazonaws.com/prageru-server/science.html?id=716",
+    embedUrl:"https://s3.amazonaws.com/prageru-server/science.html?id=716"
+  },
+  {
+    id:"eaglercraft", name:"Eaglercraft", category:"Arcade", icon:"⛏️",
+    description:"Try playing EaglercraftX 1.8 inside Wheatly. If the host blocks embedding, use Open game.",
+    url:"https://www.eaglercraft.club/vanilla-1.8/",
+    embedUrl:"https://www.eaglercraft.club/vanilla-1.8/"
+  }
+];
+
+const $ = id => document.getElementById(id);
+const WHEATLY_BACKEND = "https://wheatly-backend.rockyramen2468.workers.dev";
+let tabs=[{title:"New tab",url:"",history:[],index:-1}];
+let activeTab=0;
+let favorites = new Set(JSON.parse(localStorage.getItem("wheatly-favorites") || "[]"));
+function safeUrl(raw){
+  try {
+    let value = raw.trim();
+    if (!value) return "";
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) {
+      value = value.includes(".") && !value.includes(" ") ? "https://" + value : "https://www.google.com/search?q=" + encodeURIComponent(value);
+    }
+    const u = new URL(value);
+    if (!["https:","http:"].includes(u.protocol)) return "";
+    return u.href;
+  } catch { return ""; }
+}
+function showView(view){
+  ["games","browser","favorites"].forEach(v => $(v+"View").classList.toggle("hidden",v!==view));
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+}
+function drawTabs(){
+  const bar=$("tabbar");bar.replaceChildren();
+  tabs.forEach((tab,i)=>{
+    const b=document.createElement("button");b.className="tab"+(i===activeTab?" active":"");
+    b.textContent=tab.title||"New tab";b.title=tab.url||"New tab";b.onclick=()=>switchTab(i);bar.append(b);
+  });
+  const add=document.createElement("button");add.className="tab-add";add.textContent="＋";add.title="New tab";add.onclick=newTab;bar.append(add);
+}
+function switchTab(i){
+  activeTab=i;const tab=tabs[i];$("address").value=tab.url||"";
+  $("frameTitle").textContent=tab.title||"New tab";drawTabs();syncBrowser();
+}
+function syncBrowser(){
+  const tab=tabs[activeTab],url=tab.url;
+  $("backBtn").disabled=tab.index<=0;$("forwardBtn").disabled=tab.index<0||tab.index>=tab.history.length-1;
+  $("browserStatus").textContent=url||"Ready";
+  if(url){
+    $("emptyFrame").classList.add("hidden");$("gameFrame").classList.remove("hidden");
+    $("frameFallback").classList.remove("hidden");$("gameFrame").src=url;
+  }else{
+    $("gameFrame").classList.add("hidden");$("gameFrame").src="about:blank";
+    $("frameFallback").classList.add("hidden");$("emptyFrame").classList.remove("hidden");
+    $("emptyFrame").innerHTML="Enter a website URL above and press Go.<br><br>Some websites block being shown inside another website.";
+  }
+}
+function navigate(raw,title){
+  const clean=safeUrl(raw);
+  if(!clean){alert("Please enter a valid website or search.");return;}
+  const tab=tabs[activeTab];tab.history=tab.history.slice(0,tab.index+1);tab.history.push(clean);tab.index=tab.history.length-1;tab.url=clean;
+  tab.title=title||new URL(clean).hostname;$("address").value=clean;
+  showView("browser");drawTabs();syncBrowser();
+}
+function launch(url,title,embed=false){
+  if(tabs[activeTab].url)newTab();
+  navigate(url,title);
+}
+function newTab(){
+  tabs.push({title:"New tab",url:"",history:[],index:-1});switchTab(tabs.length-1);showView("browser");
+}
+function goBack(){const t=tabs[activeTab];if(t.index>0){t.index--;t.url=t.history[t.index];$("address").value=t.url;drawTabs();syncBrowser();}}
+function goForward(){const t=tabs[activeTab];if(t.index<t.history.length-1){t.index++;t.url=t.history[t.index];$("address").value=t.url;drawTabs();syncBrowser();}}
+function refreshPage(){const f=$("gameFrame");if(tabs[activeTab].url)f.src=tabs[activeTab].url;}
+function card(game){
+ const el=document.createElement("article"); el.className="card";
+ el.innerHTML=`<div class="emoji">${game.icon}</div><span class="tag">${game.category}</span><h3></h3><p></p><div class="actions"></div>`;
+ el.querySelector("h3").textContent=game.name; el.querySelector("p").textContent=game.description;
+ const actions=el.querySelector(".actions");
+ const open=document.createElement("button");open.className="btn";open.textContent="Open game ↗";open.onclick=()=>launch(game.url,game.name,false);actions.append(open);
+ if(game.embedUrl){
+   const play=document.createElement("button");play.className="btn secondary";play.textContent="Play here";play.onclick=()=>launch(game.embedUrl,game.name,true);actions.prepend(play);
+ }
+ const fav=document.createElement("button");fav.className="btn secondary";fav.textContent=favorites.has(game.id)?"★ Saved":"☆ Favorite";
+ fav.onclick=()=>{favorites.has(game.id)?favorites.delete(game.id):favorites.add(game.id);localStorage.setItem("wheatly-favorites",JSON.stringify([...favorites]));render();};actions.append(fav);
+ return el;
+}
+function render(){
+ const term=$("search").value.toLowerCase(),cat=$("category").value;
+ const filtered=GAMES.filter(g=>(cat==="all"||g.category===cat)&&(g.name+" "+g.description+" "+g.category).toLowerCase().includes(term));
+ $("gameGrid").replaceChildren(...filtered.map(card));
+ $("favoritesGrid").replaceChildren(...GAMES.filter(g=>favorites.has(g.id)).map(card));
+}
+$("search").addEventListener("input",render);$("category").addEventListener("change",render);
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+$("goBrowser").onclick=()=>navigate($("address").value,"Browser");
+$("address").addEventListener("keydown",e=>{if(e.key==="Enter")navigate($("address").value,"Browser")});
+async function checkWithBackend(){
+ const current=tabs[activeTab].url;
+ if(!current){$("browserStatus").textContent="Enter a website first";return;}
+ $("browserStatus").textContent="Checking approved host…";
+ try{
+   const endpoint=WHEATLY_BACKEND+"/check?url="+encodeURIComponent(current);
+   const response=await fetch(endpoint,{method:"GET"});
+   const data=await response.json();
+   if(!response.ok){$("browserStatus").textContent=data.error||"Backend check failed";return;}
+   $("browserStatus").textContent=data.reachable?`Reachable · HTTP ${data.status}`:(data.error||`HTTP ${data.status}`);
+ }catch(error){$("browserStatus").textContent="Backend connection failed";}
+}
+function openCurrentExternal(){const u=tabs[activeTab].url;if(u)window.open(u,"_blank","noopener,noreferrer");}
+$("openExternal").onclick=openCurrentExternal;
+$("checkBackend").onclick=checkWithBackend;
+$("fallbackOpen").onclick=openCurrentExternal;
+$("newTab").onclick=newTab;$("backBtn").onclick=goBack;$("forwardBtn").onclick=goForward;$("refreshBtn").onclick=refreshPage;
+$("gamesTop").onclick=()=>showView("games");$("explore").onclick=()=>showView("games");
+drawTabs();render();
+</script>
+</body>
+</html>
